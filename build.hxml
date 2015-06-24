@@ -1,0 +1,4 @@
+-main com.grapefrukt.utils.plod.Plod
+-lib lime
+-lib mlib
+-neko run.n

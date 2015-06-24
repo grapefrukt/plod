@@ -1,0 +1,13 @@
+{
+  "name": "plod",
+  "url": "http://github.com/grapefrukt/plod",
+  "license": "MIT",
+  "tags": [ "flash", "cpp", "neko", "js" ],
+  "description": "plod is a utility to extract information about an openfl build at compile time, then compress and upload said build to a website",
+  "version": "0.0.1",
+  "releasenote": "First release",
+  "contributors": [ "grapefrukt" ],
+  "dependencies": { "mlib": "",
+  					"lime" : "",
+  					"openfl" : "" }
+}
