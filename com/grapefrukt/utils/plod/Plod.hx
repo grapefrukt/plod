@@ -55,7 +55,7 @@ class Plod {
 	
 	static function copyBuild(into:File) {
 		into.createDirectory();
-		config.build.copyTo(into);
+		config.build.copyTo(into, true, null, false);
 		config.workingDir.resolveFile('build.json').copyTo(into);
 	}
 	
