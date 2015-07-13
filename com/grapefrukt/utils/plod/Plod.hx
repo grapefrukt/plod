@@ -50,6 +50,7 @@ class Plod {
 	static private function toDropbox() {
 		print('Copying to Dropbox... ', false);
 		copyBuild(config.platformDropbox);
+		fixExecutable(config.platformDropbox);
 		print('completed!');
 	}
 	
@@ -64,8 +65,11 @@ class Plod {
 		
 		// copy the build into the temp folder
 		copyBuild(tmp);
+		fixExecutable(tmp);
+
 		// move into this folder and zip *
 		Sys.setCwd(tmp.toString());
+
 		var p = new Process(config.zip, ['a', '${data.file}.zip', '*']);
 
 		// read the exit code here to block the process
@@ -81,6 +85,7 @@ class Plod {
 	}
 	
 	static function toWebsite() {
+
 		print('Uploading to website... ', false);
 		if (!config.useCompression) copyBuild(tmp);
 		else zip(true);
@@ -95,6 +100,14 @@ class Plod {
 		Sys.setCwd(config.workingDir.toString());
 		
 		return checkProcessResult(p);
+	}
+
+	static function fixExecutable(path:File) {
+		if (data.platform == 'mac' && data.host == 'mac') {
+			Sys.setCwd(path.toString());
+			var p = new Process('chmod', ['+x', '${data.file}.app/Contents/MacOS/${data.file}']);
+			var result = checkProcessResult(p, true);
+		}
 	}
 	
 	static function replaceTemplates(string:String) {
