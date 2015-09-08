@@ -172,6 +172,12 @@ class BuildData {
 		var j = Json.parse(s);
 		
 		date = 		j.date != null ? Date.fromString(j.date) : null;
+
+		if (date == null) {
+			Plod.error('Unable to parse date from plod.json, file is likely incomplete');
+			return false;
+		}
+		
 		host = 		j.host;
 		platform = 	j.platform;
 		tag = 		j.tag;
