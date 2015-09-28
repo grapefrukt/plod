@@ -43,7 +43,7 @@ class Plod {
 		
 		var command = args.pop();
 		switch (command) {
-			case 'put' | '' : 
+			case 'put' | null: 
 				put();
 			case 'get' :
 				get();
