@@ -14,6 +14,7 @@ private class PlatformConfig {
 	public var dropbox:String;
 	public var zip:String;
 	public var scp:String;
+	public var assets:Array<String>;
 	
 	public function new() { };
 }
@@ -22,10 +23,18 @@ class Config {
 	var data:BuildData;
 	var _workingDir:String;
 	var platforms:Map<String, PlatformConfig>;
+	var json:Dynamic;
+	
+	var hostPlatform(get, never):PlatformConfig;
 	
 	public var dropbox(get, never):File;
 	public var platformDropbox(get, never):File;
 	public var build(get, never):File;
+	
+	var assetsPath:String;
+	public var assetsDropbox(get, never):Array<File>;
+	public var assetsLocal(get, never):Array<File>;
+	public var assetsRaw(get, never):Array<String>;
 	
 	public var workingDir(get, never):File;
 	
@@ -42,7 +51,7 @@ class Config {
 	}
 	
 	function get_dropbox() {
-		var p = platforms.get(Std.string(PlatformHelper.hostPlatform));
+		var p = hostPlatform;
 		return File.current.resolveDirectory(p.dropbox);
 	}
 	
@@ -71,23 +80,28 @@ class Config {
 			default					: true;
 		}
 	}
-		
-	function get_platformDropbox() {
-		return dropbox.resolvePath(Std.string(data.platform));
+	
+	function get_assetsDropbox() {
+		var assets = [];
+		var paths = hostPlatform.assets;
+		for (path in paths) assets.push(platformDropbox.resolveDirectory(path));
+		return assets;
 	}
 	
-	function get_zip() {
-		return platforms.get(Std.string(PlatformHelper.hostPlatform)).zip;
+	function get_assetsLocal() {
+		var assets = [];
+		var paths = hostPlatform.assets;
+		for (path in paths) assets.push(workingDir.resolveDirectory(assetsPath).resolveDirectory(path));
+		return assets;
 	}
 	
-	function get_scp() {
-		return platforms.get(Std.string(PlatformHelper.hostPlatform)).scp;
-	}
+	function get_platformDropbox() return dropbox.resolvePath(Std.string(data.platform));
+	function get_zip() return hostPlatform.zip;
+	function get_scp() return hostPlatform.scp;
+	function get_workingDir() return File.current.resolveDirectory(_workingDir);
+	function get_assetsRaw() return hostPlatform.assets;
+	function get_hostPlatform() return platforms.get(Std.string(PlatformHelper.hostPlatform));
 	
-	function get_workingDir() {
-		return File.current.resolveDirectory(_workingDir);
-	}
-
 	public function setData(data:BuildData) {
 		this.data = data;
 	}
@@ -102,13 +116,14 @@ class Config {
 		platforms = new Map();
 		
 		var s = f.readString();
-		var j = Json.parse(s);
+		json = Json.parse(s);
 		
-		serverPath = Reflect.field(j, 'serverPath');
+		serverPath = Reflect.field(json, 'serverPath');
+		assetsPath = Reflect.field(json, 'assetsPath');
 		
-		for (platform in Reflect.fields(j)) {
+		for (platform in Reflect.fields(json)) {
 			var platformConfig = new PlatformConfig();
-			var platformData = Reflect.field(j, platform);
+			var platformData = Reflect.field(json, platform);
 			
 			for (field in Type.getInstanceFields(PlatformConfig)) {
 				Reflect.setField(platformConfig, field, Reflect.getProperty(platformData, field));

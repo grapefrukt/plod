@@ -1,8 +1,6 @@
 package com.grapefrukt.utils.plod;
 import haxe.Json;
-import lime.project.HXProject;
 import massive.sys.io.File;
-import sys.FileSystem;
 import sys.io.Process;
 
 /**
@@ -16,14 +14,16 @@ class Plod {
 	static var tmp:File;
 		
 	public static function main() {
-		var workingDirectory = Sys.args().pop();
+		var args = Sys.args();
+		
+		var workingDirectory = args.pop();
 		config = new Config(workingDirectory);
 		
 		if (!config.parse()) return;
 		
 		print('PLOD');
 		print('');
-		
+
 		data = new BuildData(config);
 		if (!data.parse()) return;
 		
@@ -41,13 +41,37 @@ class Plod {
 		print('debug:      ${data.debug}');
 		print('');
 		
-		toDropbox();
-		toWebsite();
+		var command = args.pop();
+		switch (command) {
+			case 'put' | '' : 
+				put();
+			case 'get' :
+				get();
+			case _ : 
+				error('unknown command: $command');
+		}
 		
 		tmp.deleteDirectory(true);
 	}
 	
-	static private function toDropbox() {
+	static function put() {
+		toDropbox();
+		toWebsite();
+	}
+	
+	static function get() {
+		var remotes = config.assetsDropbox;
+		var locals = config.assetsLocal;
+		
+		for (i in 0 ... remotes.length) {
+			var remote = remotes[i];
+			var local = locals[i];
+			
+			remote.copyTo(local, true);
+		}
+	}
+	
+	static function toDropbox() {
 		print('Copying to Dropbox... ', false);
 		copyBuild(config.platformDropbox);
 		fixExecutable(config.platformDropbox);
@@ -56,7 +80,11 @@ class Plod {
 	
 	static function copyBuild(into:File) {
 		into.createDirectory();
-		config.build.copyTo(into, true, null, false);
+		
+		var exclude = StringTools.replace('(' + config.assetsRaw.join(')|(') + ')', '\\', '\\\\');
+		var regex = new EReg(exclude, '');
+		
+		config.build.copyTo(into, true, regex, true);
 		config.workingDir.resolveFile('build.json').copyTo(into);
 	}
 	
