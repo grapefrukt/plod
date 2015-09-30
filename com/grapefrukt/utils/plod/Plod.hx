@@ -43,12 +43,9 @@ class Plod {
 		
 		var command = args.pop();
 		switch (command) {
-			case 'put' | null: 
-				put();
-			case 'get' :
-				get();
-			case _ : 
-				error('unknown command: $command');
+			case 'put' | null : put();
+			case 'get' :		get();
+			case _ : 			error('unknown command: $command');
 		}
 		
 		tmp.deleteDirectory(true);
