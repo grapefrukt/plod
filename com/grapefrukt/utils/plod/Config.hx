@@ -84,14 +84,14 @@ class Config {
 	function get_assetsDropbox() {
 		var assets = [];
 		var paths = hostPlatform.assets;
-		for (path in paths) assets.push(platformDropbox.resolveDirectory(path));
+		for (path in paths) assets.push(platformDropbox.resolvePath(path));
 		return assets;
 	}
 	
 	function get_assetsLocal() {
 		var assets = [];
 		var paths = hostPlatform.assets;
-		for (path in paths) assets.push(workingDir.resolveDirectory(assetsPath).resolveDirectory(path));
+		for (path in paths) assets.push(workingDir.resolveDirectory(assetsPath).resolvePath(path));
 		return assets;
 	}
 	
