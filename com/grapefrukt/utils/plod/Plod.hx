@@ -78,8 +78,11 @@ class Plod {
 	static function copyBuild(into:File) {
 		into.createDirectory();
 		
-		var exclude = StringTools.replace('(' + config.assetsRaw.join(')|(') + ')', '\\', '\\\\');
-		var regex = new EReg(exclude, '');
+		var regex = null;
+		if (config.assetsRaw != null) {
+			var exclude = StringTools.replace('(' + config.assetsRaw.join(')|(') + ')', '\\', '\\\\');
+			regex = new EReg(exclude, '');
+		}
 		
 		config.build.copyTo(into, true, regex, true);
 		config.workingDir.resolveFile('build.json').copyTo(into);
