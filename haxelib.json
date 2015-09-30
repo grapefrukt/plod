@@ -8,6 +8,6 @@
   "releasenote": "First release",
   "contributors": [ "grapefrukt" ],
   "dependencies": { "mlib": "",
-  					"lime" : "",
-  					"openfl" : "" }
+  					"lime" : ""
+				}
 }
